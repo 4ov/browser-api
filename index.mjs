@@ -32,6 +32,7 @@ api.get("/get", async (c) => {
     return c.json(await process(processUrl));
 });
 
-serve(app, (o) => {
-    console.log("started", o.port);
+serve({
+    fetch: app.fetch,
+    port: 8080
 });

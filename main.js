@@ -7,18 +7,15 @@ const PROD = false;
 
 globalThis.rich = true;
 
-
-
 /**
- * 
- * @param  {Parameters<console['log']>} args 
+ *
+ * @param  {Parameters<console['log']>} args
  */
-function debug(...args){
-    if(PROD){
+function debug(...args) {
+    if (PROD) {
         console.log(...args);
     }
 }
-
 
 /**
  *
@@ -27,7 +24,9 @@ function debug(...args){
 export function process(_url) {
     return new Promise(async (resolve, reject) => {
         let url = new $URL(_url.toString());
-        url = url.protocol ? url : new $URL(withProtocol(_url.toString(), "http://"))
+        url = url.protocol
+            ? url
+            : new $URL(withProtocol(_url.toString(), "http://"));
         if (
             (/\d+\.\d+\.\d+\.\d+/.test(url.hostname) ||
                 url.hostname.startsWith("localhost")) &&
@@ -60,14 +59,14 @@ export function process(_url) {
         window.document.addEventListener("DOMContentLoaded", () => {
             setImmediate(() => {
                 const title = document.title;
+                console.log(document.head.outerHTML);
+
                 const description =
                     document
-                        .querySelector('meta[name="description"]')
-                        ?.getAttribute("content") ||
-                    document
-                        .querySelector('meta[name="og:description"]')
-                        ?.getAttribute("content") ||
-                    null;
+                        .querySelector(
+                            `meta[property*="description"], meta[name*=description]`
+                        )
+                        ?.getAttribute("content") || null;
                 const fav_url = new URL("https://www.google.com/s2/favicons");
                 fav_url.searchParams.set("domain", url.hostname);
                 fav_url.searchParams.set("sz", "128");
@@ -75,8 +74,8 @@ export function process(_url) {
                     title,
                     description,
                     fav_url: fav_url.toString(),
-                    url: result.url
-                })
+                    url: result.url,
+                });
                 debug(title, description, fav_url.toString());
                 window.close();
             });
