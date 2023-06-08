@@ -23,6 +23,7 @@ function debug(...args) {
  */
 export function process(_url) {
     return new Promise(async (resolve, reject) => {
+        console.time("process");
         let url = new $URL(_url.toString());
         url = url.protocol
             ? url
@@ -42,16 +43,16 @@ export function process(_url) {
                     "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36",
             },
         });
+        const { window } = new JSDOM(await result.text(), {
+            url: result.url,
+        });
+        // console.log(url.toString());
+        // const { window } = await JSDOM.fromURL(url.toString(), {
+        //     // runScripts: "dangerously",
+        //     // resources: "usable",
+        //     // pretendToBeVisual: true,
+        // });
 
-        const { window } = new JSDOM(
-            await result.text(),
-            // fs.readFileSync("./index.html", { encoding: "utf-8" }),
-            {
-                url: result.url,
-                runScripts: "dangerously",
-                resources: "usable",
-            }
-        );
         const { document } = window;
 
         window.scrollTo = function () {};
@@ -59,7 +60,6 @@ export function process(_url) {
         window.document.addEventListener("DOMContentLoaded", () => {
             setImmediate(() => {
                 const title = document.title;
-                console.log(document.head.outerHTML);
 
                 const description =
                     document
@@ -74,10 +74,11 @@ export function process(_url) {
                     title,
                     description,
                     fav_url: fav_url.toString(),
-                    url: result.url,
+                    url: window.location.href, //result.url,
                 });
                 debug(title, description, fav_url.toString());
                 window.close();
+                console.timeEnd("process");
             });
         });
     });
